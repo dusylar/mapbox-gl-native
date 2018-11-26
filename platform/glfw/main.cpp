@@ -19,8 +19,6 @@
 #include <cstdio>
 #include <array>
 
-namespace {
-
 GLFWView* view = nullptr;
 
 } // namespace
