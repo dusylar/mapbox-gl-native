@@ -1,3 +1,4 @@
+#include <QMapbox>
 #include <QtGlobal>
 
 #include <QOpenGLContext>
@@ -8,7 +9,7 @@
 namespace mbgl {
 namespace gl {
 
-void glLoader() {
+Q_MAPBOXGL_EXPORT void glLoader() {
     GLFunctionPointers fps = {
         [](auto... args) { return QOpenGLContext::currentContext()->functions()->glActiveTexture(args...); },
         [](auto... args) { return QOpenGLContext::currentContext()->functions()->glAttachShader(args...); },

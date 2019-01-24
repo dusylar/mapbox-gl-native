@@ -227,7 +227,7 @@ public:
     State<value::PixelStoreUnpack> pixelStoreUnpack;
 
     bool supportsHalfFloatTextures = false;
-    const uint32_t maximumVertexBindingCount;
+    uint32_t maximumVertexBindingCount;
     static constexpr const uint32_t minimumRequiredVertexBindingCount = 8;
     
 private:

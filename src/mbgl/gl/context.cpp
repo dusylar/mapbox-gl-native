@@ -8,6 +8,7 @@
 #include <mbgl/util/logging.hpp>
 
 #include <cstring>
+#include <mutex>
 
 namespace mbgl {
 namespace gl {
@@ -82,12 +83,19 @@ static_assert(underlying_type(BufferUsage::DynamicDraw) == GL_DYNAMIC_DRAW, "Ope
 
 static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mismatch");
 
-Context::Context()
-    : maximumVertexBindingCount([] {
-          GLint value;
-          getGLFunctionPointers().glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value);
-          return value;
-      }()) {
+namespace {
+
+std::once_flag once;
+
+}
+
+Context::Context() {
+    GLint value;
+
+    std::call_once(once, gl::glLoader);
+
+    getGLFunctionPointers().glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &value);
+    maximumVertexBindingCount = value;
 }
 
 Context::~Context() {

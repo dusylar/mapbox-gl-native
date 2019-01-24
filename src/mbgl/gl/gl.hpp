@@ -6,6 +6,12 @@ namespace mbgl {
 namespace gl {
 
 /**
+ * @brief Hook for the underlying platform to register
+ * the GL function pointers.
+ */
+void glLoader();
+
+/**
  * @brief Get the global table of OpenGL function pointers.
  *
  * @return Table of OpenGL function pointers.
