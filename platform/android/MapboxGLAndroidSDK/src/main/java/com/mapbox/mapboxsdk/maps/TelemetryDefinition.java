@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.os.Bundle;
+
 import com.mapbox.mapboxsdk.offline.OfflineRegionDefinition;
 
 /**
@@ -46,4 +48,10 @@ public interface TelemetryDefinition {
    * @param offlineDefinition the offline region definition
    */
   void onCreateOfflineRegion(OfflineRegionDefinition offlineDefinition);
+
+  /**
+   * Register performance event.
+   * @param data performance event data
+   */
+  void onPerformanceEvent(Bundle data);
 }

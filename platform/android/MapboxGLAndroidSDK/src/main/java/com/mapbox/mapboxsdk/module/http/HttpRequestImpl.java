@@ -1,17 +1,21 @@
 package com.mapbox.mapboxsdk.module.http;
 
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import com.mapbox.mapboxsdk.BuildConfig;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.http.HttpRequest;
 import com.mapbox.mapboxsdk.http.HttpIdentifier;
 import com.mapbox.mapboxsdk.http.HttpLogger;
 import com.mapbox.mapboxsdk.http.HttpResponder;
 import com.mapbox.mapboxsdk.http.HttpRequestUrl;
+import com.mapbox.mapboxsdk.maps.TelemetryDefinition;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Dispatcher;
@@ -113,8 +117,16 @@ public class HttpRequestImpl implements HttpRequest {
 
     @Override
     public void onResponse(@NonNull Call call, @NonNull Response response) {
+
       if (response.isSuccessful()) {
         HttpLogger.log(Log.VERBOSE, String.format("[HTTP] Request was successful (code = %s).", response.code()));
+        TelemetryDefinition telemetry = Mapbox.getTelemetry();
+        if (telemetry != null) {
+          Bundle data = new Bundle();
+          data.putString("metrics_name", "metrics_latency");
+          data.putLong("latency", response.receivedResponseAtMillis() - response.sentRequestAtMillis());
+          telemetry.onPerformanceEvent(data);
+        }
       } else {
         // We don't want to call this unsuccessful because a 304 isn't really an error
         String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
@@ -157,6 +169,14 @@ public class HttpRequestImpl implements HttpRequest {
         HttpLogger.logFailure(type, errorMessage, requestUrl);
       }
       httpRequest.handleFailure(type, errorMessage);
+
+      TelemetryDefinition telemetry = Mapbox.getTelemetry();
+      if (telemetry != null) {
+        Bundle data = new Bundle();
+        data.putString("metrics_name", "metrics_latency");
+        data.putInt("failure_type", type);
+        telemetry.onPerformanceEvent(data);
+      }
     }
 
     private int getFailureType(Exception e) {
